@@ -11,7 +11,7 @@ int main()
 { 
     
     InitWindow(288 , 512 ,"FlapyBirdsJorge");
-
+    float delta_time = 0.0f;
     StateMachine state_machine = StateMachine();
     state_machine.add_state(std::make_unique<MainGameState>(), false);
     state_machine.handle_state_changes(delta_time);
