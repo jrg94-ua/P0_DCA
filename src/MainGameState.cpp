@@ -32,6 +32,24 @@ void MainGameState::handleInput()
 
 void MainGameState::update(float deltaTime)
 {
+    /**
+        @brief Creamos una variable de gravedad e inicializamos a 300
+    */
+
+    const float gravedad = 300.0f;
+
+    /**
+        @brief ajustamos la nueva velocidad del jugador con el deltaTime
+    */
+    jugador.vy += gravedad * deltaTime;
+    /**
+        @brief La nueva posicion del jugador 
+    */
+    jugador.y += jugador.vy * deltaTime;
+    /**
+        @brief Volvemos a reinstaurar la vel a 0
+    */
+    jugador.vy = 0.0f;
 
 }
 
