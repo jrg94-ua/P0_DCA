@@ -60,6 +60,19 @@ void MainGameState::render()
     ClearBackground(RAYWHITE);
 
     DrawText("Flappy Bird",50 ,100 , 20,BLACK );
+    
+    
+    /**
+     * @brief Dibuja al pájaro como un círculo rojo de radio 17 px
+     *        
+     */
+
+    DrawCircle(
+        static_cast<int>(jugador.x),  // Se hace el cast a int porque lo hemos definido ante como float
+        static_cast<int>(jugador.y),  
+        17,                           
+        RED                            
+    );
 
     EndDrawing(); 
 
