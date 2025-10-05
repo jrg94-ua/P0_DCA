@@ -1,5 +1,7 @@
 #include <MainGameState.hpp>
 #include <iostream>
+#include "StateMachine.hpp"
+#include "GameOverState.hpp"
 
 extern "C" {
     #include <raylib.h>
@@ -45,7 +47,7 @@ void MainGameState::update(float deltaTime)
         int pipe_y_offset_top = GetRandomValue(PIPE_H / 2, GetScreenHeight() / 2);
 
         PipePair newPipe;
-        newPipe.top = { static_cast<float>(GetScreenWidth()), -pipe_y_offset_top, PIPE_W, PIPE_H };
+        newPipe.top = { static_cast<float>(GetScreenWidth()), static_cast<float>(-pipe_y_offset_top), PIPE_W, PIPE_H };
         newPipe.bot = { static_cast<float>(GetScreenWidth()),
                         (PIPE_H - pipe_y_offset_top) + GetRandomValue(PIPE_H / 2, GetScreenHeight() / 2),
                         PIPE_W, PIPE_H };
