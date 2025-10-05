@@ -32,93 +32,61 @@ void MainGameState::handleInput()
 
 void MainGameState::update(float deltaTime)
 {
-    /**
-        @brief Creamos una variable de gravedad e inicializamos a 300
-    */
+    /** @brief Aplica la gravedad y actualiza la posición del jugador. */
     const float gravedad = 300.0f;
-
-    /**
-        @brief Ajustamos la nueva velocidad del jugador con el deltaTime
-    */
     jugador.vy += gravedad * deltaTime;
-
-    /**
-        @brief Calculamos la nueva posición del jugador 
-    */
     jugador.y += jugador.vy * deltaTime;
 
-   
-
-    /**
-        @brief Actualizamos el temporizador de aparición de tuberías
-    */
+    /** @brief Controla el temporizador y genera nuevas tuberías periódicamente. */
     spawnTimer += deltaTime;
-
-    /**
-        @brief Cada spawnEvery ciclos, generamos un nuevo par de tuberías
-    */
     if (spawnTimer >= spawnEvery)
     {
         spawnTimer = 0.0f;
-
-        /**
-            @brief Calculamos un valor aleatorio para el desplazamiento de la tubería superior.
-            El valor mínimo será la mitad de la altura de la tubería y el máximo la mitad
-            de la altura de la pantalla.
-        */
         int pipe_y_offset_top = GetRandomValue(PIPE_H / 2, GetScreenHeight() / 2);
 
-        /**
-            @brief Creamos una nueva estructura PipePair con dos rectángulos:
-                   uno para la tubería superior y otro para la inferior.
-        */
         PipePair newPipe;
+        newPipe.top = { static_cast<float>(GetScreenWidth()), -pipe_y_offset_top, PIPE_W, PIPE_H };
+        newPipe.bot = { static_cast<float>(GetScreenWidth()),
+                        (PIPE_H - pipe_y_offset_top) + GetRandomValue(PIPE_H / 2, GetScreenHeight() / 2),
+                        PIPE_W, PIPE_H };
 
-        /**
-            @brief Definimos las coordenadas de la tubería superior.
-                   Ambas comienzan en x = ancho de la pantalla.
-        */
-        newPipe.top = {
-            static_cast<float>(GetScreenWidth()),  // posición x
-            -pipe_y_offset_top,                    // posición y negativa según offset
-            PIPE_W,                                // anchura
-            PIPE_H                                 // altura
-        };
-
-        /**
-            @brief Definimos las coordenadas de la tubería inferior.
-                   Su posición en y se calcula según el desplazamiento de la superior.
-        */
-        newPipe.bot = {
-            static_cast<float>(GetScreenWidth()),  // misma posición x
-            (PIPE_H - pipe_y_offset_top) + GetRandomValue(PIPE_H / 2, GetScreenHeight() / 2),
-            PIPE_W,
-            PIPE_H
-        };
-
-        /**
-            @brief Insertamos el nuevo par de tuberías en la cola (deque)
-        */
         pipes.push_back(newPipe);
     }
 
-    /**
-        @brief Movemos las tuberías hacia la izquierda a la misma velocidad.
-               La distancia recorrida depende de deltaTime.
-    */
+    /** @brief Mueve las tuberías activas hacia la izquierda y elimina las que salen de pantalla. */
     for (auto& pipe : pipes)
     {
         pipe.top.x -= PIPE_SPEED * deltaTime;
         pipe.bot.x -= PIPE_SPEED * deltaTime;
     }
 
-    /**
-        @brief Si la tubería frontal sale completamente de la pantalla,
-               la eliminamos de la cola para liberar memoria.
-    */
     if (!pipes.empty() && pipes.front().top.x + PIPE_W < 0)
-    {
         pipes.pop_front();
+
+    /** @brief Define el bounding box del jugador para detectar colisiones. */
+    const float radio = 17.0f;
+    Rectangle jugadorBox = {
+        jugador.x - radio,
+        jugador.y - radio,
+        radio * 2,
+        radio * 2
+    };
+
+    /** @brief Detecta colisiones entre el jugador y las tuberías. */
+    for (auto& pipe : pipes)
+    {
+        if (CheckCollisionRecs(jugadorBox, pipe.top) || CheckCollisionRecs(jugadorBox, pipe.bot))
+        {
+            this->state_machine->add_state(std::make_unique<GameOverState>(), true);
+            return;
+        }
+    }
+
+    /** @brief Detecta si el jugador sale de los límites de la pantalla. */
+    if (jugador.y - radio < 0 || jugador.y + radio > GetScreenHeight())
+    {
+        this->state_machine->add_state(std::make_unique<GameOverState>(), true);
+        return;
     }
 }
 
@@ -144,7 +112,7 @@ void MainGameState::render()
      * @brief Dibuja al pájaro como un círculo rojo de radio 17 px.
      */
     DrawCircle(
-        static_cast<int>(jugador.x),  // Se hace el cast a int porque lo hemos definido antes como float
+        static_cast<int>(jugador.x),  
         static_cast<int>(jugador.y),  
         17,                           
         RED                           
