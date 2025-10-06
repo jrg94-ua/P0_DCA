@@ -27,7 +27,7 @@ void MainGameState::handleInput()
 
     if (IsKeyPressed(KEY_SPACE))
     {
-        jugador.vy = -300.0f;  
+        jugador.vy = -200.0f;  
     }
 
 }
@@ -35,7 +35,7 @@ void MainGameState::handleInput()
 void MainGameState::update(float deltaTime)
 {
     /** @brief Aplica la gravedad y actualiza la posición del jugador. */
-    const float gravedad = 300.0f;
+    const float gravedad = 200.0f;
     jugador.vy += gravedad * deltaTime;
     jugador.y += jugador.vy * deltaTime;
 
