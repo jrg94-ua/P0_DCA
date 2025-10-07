@@ -65,6 +65,16 @@ void MainGameState::update(float deltaTime)
     if (!pipes.empty() && pipes.front().top.x + PIPE_W < 0)
         pipes.pop_front();
 
+    /** @brief Actualiza la puntuación cuando el jugador pasa una tubería. */
+    for (auto& pipe : pipes)
+    {
+        if (!pipe.scored && (pipe.top.x + PIPE_W) < jugador.x)
+        {
+            pipe.scored = true;
+            score++;
+        }
+    }
+
     /** @brief Define el bounding box del jugador para detectar colisiones. */
     const float radio = 17.0f;
     Rectangle jugadorBox = {
@@ -79,7 +89,7 @@ void MainGameState::update(float deltaTime)
     {
         if (CheckCollisionRecs(jugadorBox, pipe.top) || CheckCollisionRecs(jugadorBox, pipe.bot))
         {
-            this->state_machine->add_state(std::make_unique<GameOverState>(), true);
+            this->state_machine->add_state(std::make_unique<GameOverState>(score), true);
             return;
         }
     }
@@ -87,10 +97,11 @@ void MainGameState::update(float deltaTime)
     /** @brief Detecta si el jugador sale de los límites de la pantalla. */
     if (jugador.y - radio < 0 || jugador.y + radio > GetScreenHeight())
     {
-        this->state_machine->add_state(std::make_unique<GameOverState>(), true);
+        this->state_machine->add_state(std::make_unique<GameOverState>(score), true);
         return;
     }
 }
+
 
 
 void MainGameState::render()
@@ -136,6 +147,10 @@ void MainGameState::render()
          */
         DrawRectangleRec(pipe.bot, GREEN);
     }
+
+    /** @brief Muestra la puntuación actual del jugador en la esquina superior izquierda. */
+    std::string scoreText = "Puntos: " + std::to_string(score);
+    DrawText(scoreText.c_str(), 20, 20, 25, BLACK);
 
     /**
      * @brief Finaliza el proceso de dibujado y actualiza la ventana.

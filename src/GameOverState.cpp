@@ -17,7 +17,6 @@ void GameOverState::update(float deltaTime) {}
 
 void GameOverState::render()
 {
-    /** @brief Renderiza la pantalla de Game Over. */
     BeginDrawing();
     ClearBackground(RAYWHITE);
 
@@ -27,7 +26,14 @@ void GameOverState::render()
     int y = GetScreenHeight() / 2 - 20;
 
     DrawText(text, x, y, 40, RED);
+
+    /** @brief Muestra la puntuación final en el centro de la pantalla. */
+    std::string scoreText = "Puntuacion: " + std::to_string(score);
+    int scoreWidth = MeasureText(scoreText.c_str(), 25);
+    DrawText(scoreText.c_str(), (GetScreenWidth() - scoreWidth) / 2, y + 60, 25, DARKGRAY);
+
     DrawText("Pulsa ESPACIO para reiniciar", 30, y + 80, 20, DARKGRAY);
+
 
     EndDrawing();
 }

@@ -29,4 +29,5 @@ private:
     static constexpr float PIPE_W = 32.0f;
     static constexpr float PIPE_H = 320.0f;
     static constexpr float PIPE_SPEED = 100.0f;
+    int score = 0; //puntuacion
 };
