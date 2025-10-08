@@ -1,6 +1,11 @@
 #include "GameOverState.hpp"
 #include "MainGameState.hpp"
 #include <memory>
+#include <string>
+
+extern "C" {
+    #include <raylib.h>
+}
 
 void GameOverState::init() {}
 
@@ -20,20 +25,33 @@ void GameOverState::render()
     BeginDrawing();
     ClearBackground(RAYWHITE);
 
-    const char* text = "GAME OVER";
-    int textWidth = MeasureText(text, 40);
-    int x = (GetScreenWidth() - textWidth) / 2;
-    int y = GetScreenHeight() / 2 - 20;
+    /** @brief Texto principal del estado Game Over. */
+    const char* titleText = "GAME OVER";
+    int titleFontSize = 32;
+    int titleWidth = MeasureText(titleText, titleFontSize);
+    int titleX = (GetScreenWidth() - titleWidth) / 2;
+    int titleY = GetScreenHeight() / 2 - 80;
 
-    DrawText(text, x, y, 40, RED);
+    DrawText(titleText, titleX, titleY, titleFontSize, RED);
 
-    /** @brief Muestra la puntuación final en el centro de la pantalla. */
+    /** @brief Texto de puntuación centrado debajo del título. */
     std::string scoreText = "Puntuacion: " + std::to_string(score);
-    int scoreWidth = MeasureText(scoreText.c_str(), 25);
-    DrawText(scoreText.c_str(), (GetScreenWidth() - scoreWidth) / 2, y + 60, 25, DARKGRAY);
+    int scoreFontSize = 20;
+    int scoreWidth = MeasureText(scoreText.c_str(), scoreFontSize);
+    int scoreX = (GetScreenWidth() - scoreWidth) / 2;
+    int scoreY = titleY + 50;
 
-    DrawText("Pulsa ESPACIO para reiniciar", 30, y + 80, 20, DARKGRAY);
+    DrawText(scoreText.c_str(), scoreX, scoreY, scoreFontSize, DARKGRAY);
 
+    /** @brief Texto de instrucciones centrado más abajo. */
+    const char* infoText = "Pulsa ESPACIO para reiniciar";
+    int infoFontSize = 16;
+    int infoWidth = MeasureText(infoText, infoFontSize);
+    int infoX = (GetScreenWidth() - infoWidth) / 2;
+    int infoY = scoreY + 40;
+
+    DrawText(infoText, infoX, infoY, infoFontSize, GRAY);
 
     EndDrawing();
 }
+

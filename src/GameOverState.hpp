@@ -1,6 +1,6 @@
 #pragma once
 #include "GameState.hpp"
-#include "StateMachine.hpp" 
+#include "StateMachine.hpp"
 
 extern "C" {
     #include <raylib.h>
@@ -12,7 +12,9 @@ extern "C" {
 class GameOverState : public GameState
 {
 public:
-    GameOverState() = default;
+    /** @brief Constructor que recibe la puntuación final del jugador. */
+    explicit GameOverState(int finalScore) : score(finalScore) {}
+
     ~GameOverState() override = default;
 
     void init() override;
@@ -22,4 +24,7 @@ public:
 
     void pause() override {};
     void resume() override {};
+
+private:
+    int score = 0; //< @brief Puntuación final del jugador
 };
