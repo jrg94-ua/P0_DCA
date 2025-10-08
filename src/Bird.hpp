@@ -19,5 +19,14 @@ struct Bird {
     /**
      * @brief Velocidad vertical 
      */
-    float vy;  
+    float vy; 
+    /**
+     * @brief Ancho del sprite del pájaro.
+     */
+    float width;
+
+    /**
+     * @brief Alto del sprite del pájaro.
+     */
+    float height; 
 };

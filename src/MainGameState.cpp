@@ -14,11 +14,23 @@ MainGameState::MainGameState()
 
 void MainGameState::init()
 {
-    jugador.x =  200.0f;
+    /** @brief Carga sprites de pájaro y tubería. */
+    birdSprite = LoadTexture("assets/yellowbird-midflap.png");
+    pipeSprite = LoadTexture("assets/pipe-green.png");
+
+    /** @brief Posición inicial y dimensiones del jugador. */
+    jugador.x = 200.0f;
     jugador.y = 200.0f;
+    jugador.width  = static_cast<float>(birdSprite.width);
+    jugador.height = static_cast<float>(birdSprite.height);
 
+    /** @brief Dimensiones de las tuberías según sprite. */
+    PIPE_W = static_cast<float>(pipeSprite.width);
+    PIPE_H = static_cast<float>(pipeSprite.height);
+
+    /** @brief Separación vertical entre tuberías. */
+    PIPE_GAP = jugador.height * 4.5f;
 }
-
 void MainGameState::handleInput()
 {
     /**
@@ -31,7 +43,6 @@ void MainGameState::handleInput()
     }
 
 }
-
 void MainGameState::update(float deltaTime)
 {
     /** @brief Aplica la gravedad y actualiza la posición del jugador. */
@@ -75,13 +86,12 @@ void MainGameState::update(float deltaTime)
         }
     }
 
-    /** @brief Define el bounding box del jugador para detectar colisiones. */
-    const float radio = 17.0f;
+    /** @brief Define el bounding box del jugador según el tamaño del sprite. */
     Rectangle jugadorBox = {
-        jugador.x - radio,
-        jugador.y - radio,
-        radio * 2,
-        radio * 2
+        jugador.x,
+        jugador.y,
+        jugador.width,
+        jugador.height
     };
 
     /** @brief Detecta colisiones entre el jugador y las tuberías. */
@@ -95,7 +105,7 @@ void MainGameState::update(float deltaTime)
     }
 
     /** @brief Detecta si el jugador sale de los límites de la pantalla. */
-    if (jugador.y - radio < 0 || jugador.y + radio > GetScreenHeight())
+    if (jugador.y < 0 || jugador.y + jugador.height > GetScreenHeight())
     {
         this->state_machine->add_state(std::make_unique<GameOverState>(score), true);
         return;
@@ -117,43 +127,53 @@ void MainGameState::render()
     ClearBackground(RAYWHITE);
 
     /**
-     * @brief Muestra el texto del título del juego.
+     * @brief Muestra el título del juego.
      */
     DrawText("Flappy Bird", 50, 100, 20, BLACK);
 
     /**
-     * @brief Dibuja al pájaro como un círculo rojo de radio 17 px.
+     * @brief Dibuja el sprite del jugador (pájaro).
      */
-    DrawCircle(
-        static_cast<int>(jugador.x),  
-        static_cast<int>(jugador.y),  
-        17,                           
-        RED                           
+    DrawTexture(
+        birdSprite,
+        static_cast<int>(jugador.x),
+        static_cast<int>(jugador.y),
+        WHITE
     );
 
     /**
-     * @brief Itera sobre todas las tuberías almacenadas en la cola (deque)
-     *        y las dibuja en pantalla como rectángulos verdes.
+     * @brief Dibuja las tuberías (superior e inferior) como sprites.
+     *        La superior se rota 180 grados para apuntar hacia abajo.
      */
     for (const auto& pipe : pipes)
     {
-        /**
-         * @brief Dibuja la tubería superior.
-         */
-        DrawRectangleRec(pipe.top, GREEN);
+        // Tubería superior (rotada)
+        DrawTextureEx(
+            pipeSprite,
+            { pipe.top.x + PIPE_W, pipe.top.y + PIPE_H },
+            180.0f,  // rotación
+            1.0f,    // escala
+            WHITE
+        );
 
-        /**
-         * @brief Dibuja la tubería inferior.
-         */
-        DrawRectangleRec(pipe.bot, GREEN);
+        // Tubería inferior (normal)
+        DrawTextureEx(
+            pipeSprite,
+            { pipe.bot.x, pipe.bot.y },
+            0.0f,   // sin rotación
+            1.0f,   // escala
+            WHITE
+        );
     }
 
-    /** @brief Muestra la puntuación actual del jugador en la esquina superior izquierda. */
+    /** 
+     * @brief Muestra la puntuación actual del jugador en la esquina superior izquierda.
+     */
     std::string scoreText = "Puntos: " + std::to_string(score);
     DrawText(scoreText.c_str(), 20, 20, 25, BLACK);
 
     /**
      * @brief Finaliza el proceso de dibujado y actualiza la ventana.
      */
-    EndDrawing(); 
+    EndDrawing();
 }
